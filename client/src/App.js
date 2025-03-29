@@ -1,36 +1,24 @@
-// C:\Users\Admin\RAUL\client\src\App.js
-
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import EmailVerificationPage from './pages/EmailVerificationPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import HomePage from './pages/HomePage';
-import ProtectedRoute from './components/ProtectedRoute';
-import './index.css';
+import { Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Booking from './pages/Booking';
+import MyBookings from './pages/MyBookings';
 
 function App() {
   return (
-    <Router>
+    <div>
+      <Header />
       <Routes>
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/verify-email" element={<EmailVerificationPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="*" element={<h1>Page not found</h1>} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/booking" element={<Booking />} />
+        <Route path="/bookings" element={<MyBookings />} />
       </Routes>
-    </Router>
+    </div>
   );
 }
 
