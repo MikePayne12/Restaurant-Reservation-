@@ -1,0 +1,118 @@
+==============================================================
+DEPENDENCIES FOR KCA STREETFOOD RESTAURANT RESERVATION SYSTEM
+==============================================================
+
+This file lists all the dependencies required for the project to run properly.
+Follow the installation instructions for each directory.
+
+=========================
+SERVER DEPENDENCIES
+=========================
+Directory: /server
+
+Core Dependencies:
+-----------------
+express                 # Web server framework
+pg                      # PostgreSQL client
+bcryptjs                # Password hashing
+jsonwebtoken            # JWT authentication
+dotenv                  # Environment variable management
+cors                    # Cross-origin resource sharing
+body-parser             # Request body parsing
+
+Development Dependencies:
+-----------------------
+nodemon                 # Auto-restart server during development
+
+Installation Command:
+-------------------
+cd server
+npm install express pg bcryptjs jsonwebtoken dotenv cors body-parser
+npm install --save-dev nodemon
+
+=========================
+CLIENT DEPENDENCIES
+=========================
+Directory: /client
+
+Core Dependencies:
+-----------------
+react                   # UI library
+react-dom               # React DOM rendering
+react-router-dom        # Routing
+axios                   # HTTP client
+tailwindcss             # CSS framework
+@headlessui/react       # Accessible UI components
+@heroicons/react        # Icon set
+react-datepicker        # Date picker component
+react-time-picker       # Time picker component
+react-toastify          # Toast notifications
+react-hook-form         # Form handling
+yup                     # Form validation
+
+Development Dependencies:
+-----------------------
+@types/react            # TypeScript definitions for React
+@types/react-dom        # TypeScript definitions for ReactDOM
+postcss                 # CSS processing
+autoprefixer            # Add vendor prefixes to CSS
+
+Installation Command:
+-------------------
+cd client
+npm install react react-dom react-router-dom axios tailwindcss @headlessui/react @heroicons/react react-datepicker react-time-picker react-toastify react-hook-form yup
+npm install --save-dev @types/react @types/react-dom postcss autoprefixer
+
+=========================
+GLOBAL DEPENDENCIES
+=========================
+These should be installed globally on your system:
+
+Node.js (v14.x or higher)
+npm (v6.x or higher)
+PostgreSQL (v13.x or higher)
+
+=========================
+DATABASE SETUP
+=========================
+A PostgreSQL database named 'restaurant_reservation' should be created.
+
+Setup Commands:
+-------------
+# Access PostgreSQL
+psql -U postgres
+
+# Create database
+CREATE DATABASE restaurant_reservation;
+
+# Exit PostgreSQL
+\q
+
+=========================
+ENVIRONMENT VARIABLES
+=========================
+Create a .env file in the server directory with the following variables:
+
+# Server Configuration
+PORT=5000
+NODE_ENV=development
+
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=restaurant_reservation
+DB_USER=postgres
+DB_PASSWORD=your_postgresql_password
+
+# JWT Configuration
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRES_IN=7d
+
+=========================
+ADDITIONAL NOTES
+=========================
+1. Make sure PostgreSQL service is running before starting the server
+2. The frontend expects the backend to be running on http://localhost:5000
+3. All client-side environment variables must be prefixed with REACT_APP_
+4. Use npm run dev in the server directory to start the server with nodemon
+5. Use npm start in the client directory to start the React development server
