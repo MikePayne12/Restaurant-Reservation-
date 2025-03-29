@@ -8,6 +8,7 @@ const PgSession = require('connect-pg-simple')(session);
 const { pool } = require('./db');
 const { setupAuth } = require('./utils/auth');
 const { storage } = require('./models/sql-storage');
+const restaurantRoutes = require('./routes/restaurant');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -45,6 +46,7 @@ app.use('/api/users', require('./routes/user'));
 app.use('/api/restaurants', require('./routes/restaurant'));
 app.use('/api/reservations', require('./routes/reservation'));
 app.use('/api/tables', require('./routes/table'));
+app.use('/api/restaurants', restaurantRoutes);
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
