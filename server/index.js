@@ -8,9 +8,6 @@ const PgSession = require('connect-pg-simple')(session);
 const { pool } = require('./db');
 const { setupAuth } = require('./utils/auth');
 const { storage } = require('./models/sql-storage');
-const restaurantRoutes = require('./routes/restaurant');
-const { router: authRoutes, authenticateToken } = require('./routes/auth');
-
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -23,6 +20,7 @@ app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:3000',
   credentials: true
 }));
+
 // Session configuration
 app.use(session({
   store: new PgSession({
@@ -39,10 +37,12 @@ app.use(session({
   }
 }));
 
+// Set up authentication routes
+setupAuth(app, storage);
+
 // API Routes
-app.use('/api/auth', authRoutes);
 app.use('/api/users', require('./routes/user'));
-app.use('/api/restaurants', restaurantRoutes);
+app.use('/api/restaurants', require('./routes/restaurant'));
 app.use('/api/reservations', require('./routes/reservation'));
 app.use('/api/tables', require('./routes/table'));
 

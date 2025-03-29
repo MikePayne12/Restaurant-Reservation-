@@ -1,25 +1,26 @@
 # KCA Streetfood Restaurant Reservation System
 
-A modern restaurant reservation system for KCA Streetfood located at KCA University, Ruaraka.
+A comprehensive mobile restaurant reservation platform specifically for KCA Streetfood located at KCA University, Ruaraka. The system leverages advanced technology to enhance dining experiences and simplify restaurant bookings.
 
-## Technologies Used
+## Tech Stack
 
-- **Frontend**: React.js with Tailwind CSS for styling
-- **Backend**: Express.js
-- **Database**: PostgreSQL
-- **Authentication**: JWT (JSON Web Token)
+- **Frontend**: React with TypeScript, Tailwind CSS
+- **Backend**: Express.js with Node.js
+- **Database**: PostgreSQL with raw SQL queries
+- **Authentication**: JWT tokens, bcrypt password hashing
+- **Session Management**: Express-session with PostgreSQL session store
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
-- [Node.js](https://nodejs.org/) (v14.x or higher)
-- [npm](https://www.npmjs.com/) (v6.x or higher)
-- [PostgreSQL](https://www.postgresql.org/) (v13.x or higher)
-- [pgAdmin 4](https://www.pgadmin.org/) (optional but recommended for database management)
+Before you can run this application, you need to have the following installed:
 
-## Installation
+1. Node.js (v14 or higher)
+2. npm or yarn
+3. PostgreSQL (v12 or higher)
 
-### 1. Clone the Repository
+## Initial Setup
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/yourusername/restaurant-reservation.git
@@ -30,15 +31,21 @@ cd restaurant-reservation
 
 1. Create a PostgreSQL database named `restaurant_reservation`:
 
-```bash
-psql -U postgres
+```sql
 CREATE DATABASE restaurant_reservation;
-\q
 ```
 
-2. Configure database connection:
+2. The database tables will be automatically created when the server starts.
 
-Create a `.env` file in the server directory with the following content (adjust as needed):
+### 3. Environment Configuration
+
+1. Copy the sample environment file to create your own:
+
+```bash
+cp .env.sample .env
+```
+
+2. Edit the `.env` file with your PostgreSQL credentials and other settings:
 
 ```
 # Database Configuration
@@ -46,120 +53,66 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=restaurant_reservation
 DB_USER=postgres
-DB_PASSWORD=your_postgresql_password
+DB_PASSWORD=your_password_here
 
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_key
+# Server Configuration
+PORT=3001
+NODE_ENV=development
+CLIENT_URL=http://localhost:3000
+
+# Authentication
+JWT_SECRET=your_jwt_secret_key_here
+SESSION_SECRET=your_session_secret_key_here
 ```
 
-### 3. Backend Setup
+### 4. Install Dependencies
 
 ```bash
-# Navigate to server directory
-cd server
-
-# Install dependencies
-npm install
-
-# Start the server
-npm start
+# Install both server and client dependencies
+npm run install-all
 ```
-
-The server will run on http://localhost:5000 by default.
-
-### 4. Frontend Setup
-
-```bash
-# Navigate to client directory in a new terminal
-cd client
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm start
-```
-
-The client will run on http://localhost:3000 by default.
 
 ## Running the Application
 
-1. Start the backend server:
 ```bash
-cd server
-npm start
+# Start both the server and client
+npm run dev
 ```
 
-2. In a separate terminal, start the frontend application:
+This will start:
+- The backend server on port 3001 (or the port specified in your .env file)
+- The frontend client on port 3000
+
+## Testing the Database Connection
+
+To verify that your database connection is working:
+
 ```bash
-cd client
-npm start
+node test-db-connection.js
 ```
 
-3. Access the application in your browser at http://localhost:3000
+## Available Scripts
+
+- `npm run install-all`: Install both server and client dependencies
+- `npm run server`: Start only the backend server
+- `npm run client`: Start only the frontend client
+- `npm run dev`: Start both server and client concurrently
+- `npm run build`: Build the client for production
 
 ## Features
 
-- **User Authentication**: Register, login, and manage user profiles
-- **Restaurant Information**: View details about KCA Streetfood restaurant
-- **Reservation Management**: Create, view, update, and cancel reservations
-- **Admin Panel**: For restaurant staff to manage reservations and settings
+- User authentication (register, login, logout)
+- Restaurant information display
+- Table availability checking
+- Reservation creation and management
+- User profile management
+- Responsive design for mobile and desktop
 
-## Default Admin Account
+## User Roles
 
-Username: admin  
-Password: admin123  
-Email: admin@kcastreetfood.com
+- **Customer**: Regular users who can browse restaurant information and make reservations
+- **Admin**: Restaurant staff who can manage reservations, tables, and view analytics
 
-## Project Structure
+## License
 
-```
-├── client/                  # Frontend React application
-│   ├── public/              # Static files
-│   ├── src/                 # Source files
-│   │   ├── components/      # React components
-│   │   ├── contexts/        # React contexts (auth, etc.)
-│   │   ├── pages/           # Page components
-│   │   └── App.js           # Main application component
-├── server/                  # Backend Express application
-│   ├── config/              # Configuration files
-│   ├── db/                  # Database scripts and models
-│   ├── routes/              # API routes
-│   ├── utils/               # Utility functions
-│   └── index.js             # Server entry point
-└── README.md                # Project documentation
-```
-
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login a user
-- `GET /api/auth/me` - Get current user information
-
-### Restaurants
-- `GET /api/restaurants` - Get all restaurants
-- `GET /api/restaurants/:id` - Get restaurant details
-
-### Reservations
-- `GET /api/reservations` - Get all reservations for current user
-- `POST /api/reservations` - Create a new reservation
-- `GET /api/reservations/:id` - Get a specific reservation
-- `PUT /api/reservations/:id` - Update a reservation
-- `DELETE /api/reservations/:id` - Cancel a reservation
-
-## Troubleshooting
-
-### Database Connection Issues
-- Ensure PostgreSQL service is running
-- Verify the database connection details in `.env` file
-- Check if the database `restaurant_reservation` exists
-
-### Server Startup Issues
-- Check if port 5000 is already in use
-- Ensure all required environment variables are set in `.env`
-- Verify that the database is accessible
-
-### Client Issues
-- Clear browser cache if experiencing strange behavior
-- Ensure API calls are directed to the correct server URL
+[MIT](LICENSE)

@@ -74,43 +74,6 @@ async function seedDatabase() {
   }
 }
 
-const restaurantsResult = await db.query('SELECT * FROM restaurants');
-if (restaurantsResult.rows.length === 0) {
-  // Add KCA Streetfood restaurant data
-  await db.query(
-    `INSERT INTO restaurants (
-      name,
-      description,
-      address,
-      phone,
-      email,
-      opening_time,
-      closing_time,
-      cuisine_type,
-      price_range,
-      image_url,
-      features,
-      rating
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-    [
-      'KCA Streetfood',
-      'KCA Streetfood offers a unique dining experience with a variety of local and international street food favorites. Our modern space features indoor and outdoor seating perfect for casual dining, study sessions, or catching up with friends.',
-      'KCA University, Ruaraka',
-      '+254 712 345678',
-      'info@kcastreetfood.com',
-      '07:00',
-      '22:00',
-      'Street Food',
-      '$',
-      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80',
-      ['Student Discounts', 'Outdoor Seating', 'Quick Service', 'Vegetarian Options', 'Breakfast Available'],
-      4.7
-    ]
-  );
-  
-  console.log('[SEED] Added restaurant: KCA Streetfood');
-}
-
 // Run if executed directly
 if (require.main === module) {
   seedDatabase()

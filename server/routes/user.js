@@ -3,22 +3,6 @@ const router = express.Router();
 const { storage } = require('../models/sql-storage');
 const { authenticateToken, requireAdmin } = require('../utils/auth');
 
-// Validate imports
-if (!storage) {
-  console.error('Error: Storage object is undefined.');
-} else {
-  console.log('Storage object loaded:', Object.keys(storage));
-}
-if (!storage.getUser || !storage.updateUser || !storage.getAllUsers) {
-  console.error('Error: One or more storage methods are undefined.');
-}
-
-if (!authenticateToken || !requireAdmin) {
-  console.error('Error: Authentication middleware is undefined.');
-} else {
-  console.log('Authentication middleware loaded successfully.');
-}
-
 // Get current user profile
 router.get('/me', authenticateToken, async (req, res) => {
   try {

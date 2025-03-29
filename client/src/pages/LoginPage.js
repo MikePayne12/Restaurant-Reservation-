@@ -1,205 +1,187 @@
-// C:\Users\Admin\RAUL\client\src\pages\LoginPage.js
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 
 function LoginPage() {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    login: '',
+    username: '',
     password: ''
   });
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [needsVerification, setNeedsVerification] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
-  // Check if user is already logged in
+  const { currentUser, login } = useAuth();
+  const navigate = useNavigate();
+  
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    // If user is already logged in, redirect to home page
+    if (currentUser) {
       navigate('/');
     }
-  }, [navigate]);
+  }, [currentUser, navigate]);
   
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    // Clear error when user types
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: null });
-    }
-  };
-  
-  const validate = () => {
-    const newErrors = {};
-    
-    // Validate login (username or email)
-    if (!formData.login.trim()) {
-      newErrors.login = 'Username or email is required';
-    }
-    
-    // Validate password
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    }
-    
-    return newErrors;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+    if (!formData.username || !formData.password) {
+      setError('Please fill in all fields');
       return;
     }
     
-    setLoading(true);
-    setErrors({});
-    
     try {
-      const response = await axios.post('/api/auth/login', {
-        login: formData.login,
-        password: formData.password
-      });
-      
-      setLoading(false);
-      
-      // Store token and user data in localStorage
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      // Redirect to home page
+      setIsLoading(true);
+      setError('');
+      await login(formData);
       navigate('/');
-    } catch (error) {
-      setLoading(false);
-      
-      if (error.response && error.response.data) {
-        // Check if user needs to verify email
-        if (error.response.data.needsVerification) {
-          setNeedsVerification(true);
-          return;
-        }
-        
-        // Handle other error messages from the server
-        setErrors({ ...errors, general: error.response.data.message });
-      } else {
-        setErrors({ ...errors, general: 'Login failed. Please try again.' });
-      }
-    }
-  };
-  
-  const handleResendVerification = async () => {
-    setLoading(true);
-    
-    try {
-      await axios.post('/api/auth/resend-verification', {
-        email: formData.login
-      });
-      
-      setLoading(false);
-      alert('Verification email has been resent. Please check your inbox.');
-    } catch (error) {
-      setLoading(false);
-      alert('Failed to resend verification email. Please try again.');
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err.response?.data || 'Failed to log in. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
     }
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link to="/register" className="font-medium text-primary hover:text-primary-dark">
-              create a new account
-            </Link>
-          </p>
-        </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {errors.general && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-              <span className="block sm:inline">{errors.general}</span>
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Sign in to your account
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Or{' '}
+          <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+            create a new account
+          </Link>
+        </p>
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
             </div>
           )}
           
-          {needsVerification && (
-            <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative" role="alert">
-              <p className="font-bold">Email verification required</p>
-              <p className="block sm:inline">Please verify your email before logging in.</p>
-              <div className="mt-2">
-                <button
-                  type="button"
-                  onClick={handleResendVerification}
-                  disabled={loading}
-                  className="text-sm text-primary hover:text-primary-dark font-medium"
-                >
-                  Resend verification email
-                </button>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
+              </label>
+              <div className="mt-1">
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
+                  required
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  value={formData.username}
+                  onChange={handleChange}
+                />
               </div>
             </div>
-          )}
-          
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div className="mb-4">
-              <label htmlFor="login" className="sr-only">Username or Email</label>
-              <input
-                id="login"
-                name="login"
-                type="text"
-                value={formData.login}
-                onChange={handleChange}
-                className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
-                  errors.login ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm`}
-                placeholder="Username or Email"
-              />
-              {errors.login && <p className="text-red-500 text-xs mt-1">{errors.login}</p>}
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="mt-1">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
-            
-            <div className="mb-2">
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
-                  errors.password ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm`}
-                placeholder="Password"
-              />
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                  Remember me
+                </label>
+              </div>
+
+              <div className="text-sm">
+                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                  Forgot your password?
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                  isLoading ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
+              >
+                {isLoading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <div>
+                <a
+                  href="#"
+                  className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                >
+                  <span className="sr-only">Sign in with Google</span>
+                  <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
+                  </svg>
+                </a>
+              </div>
+
+              <div>
+                <a
+                  href="#"
+                  className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                >
+                  <span className="sr-only">Sign in with Facebook</span>
+                  <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      fillRule="evenodd"
+                      d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-primary hover:text-primary-dark">
-                Forgot your password?
-              </Link>
-            </div>
-          </div>
-          
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${
-                loading ? 'opacity-70 cursor-not-allowed' : ''
-              }`}
-            >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );

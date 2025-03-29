@@ -57,21 +57,14 @@ async function initializeDatabase() {
   try {
     // Create users table
     await query(`
-    
-  CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    phone VARCHAR(20),
-    is_admin BOOLEAN DEFAULT false,
-    is_verified BOOLEAN DEFAULT false,
-    verification_token VARCHAR(255),
-    verification_expires TIMESTAMP,
-    reset_password_token VARCHAR(255),
-    reset_password_expires TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        phone VARCHAR(50),
+        is_admin BOOLEAN DEFAULT FALSE
       )
     `);
 
@@ -81,19 +74,18 @@ async function initializeDatabase() {
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         description TEXT,
-        address VARCHAR(255) NOT NULL,
-        phone VARCHAR(20),
-        email VARCHAR(100),
-        opening_time TIME NOT NULL,
-        closing_time TIME NOT NULL,
         cuisine_type VARCHAR(50),
         price_range VARCHAR(10),
+        location VARCHAR(255),
+        distance VARCHAR(50),
         image_url TEXT,
+        rating VARCHAR(10),
+        open_time VARCHAR(10),
+        close_time VARCHAR(10),
         features TEXT[],
-        rating NUMERIC(2,1),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        capacity INTEGER DEFAULT 50
       )
-    `); 
+    `);
 
     // Create tables table (for restaurant tables)
     await query(`
