@@ -7,7 +7,7 @@ const pgConfig = {
   port: process.env.DB_PORT || 5432,
   database: process.env.DB_NAME || 'restaurant_reservation',
   user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres'
+  password: process.env.DB_PASSWORD || 'Dimeswetrust'
 };
 
 // Create a new PostgreSQL connection pool
@@ -71,19 +71,20 @@ async function initializeDatabase() {
     // Create restaurants table
     await query(`
       CREATE TABLE IF NOT EXISTS restaurants (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        description TEXT,
-        cuisine_type VARCHAR(50),
-        price_range VARCHAR(10),
-        location VARCHAR(255),
-        distance VARCHAR(50),
-        image_url TEXT,
-        rating VARCHAR(10),
-        open_time VARCHAR(10),
-        close_time VARCHAR(10),
-        features TEXT[],
-        capacity INTEGER DEFAULT 50
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    address VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    opening_time TIME NOT NULL,
+    closing_time TIME NOT NULL,
+    cuisine_type VARCHAR(50),
+    price_range VARCHAR(10),
+    image_url TEXT,
+    features TEXT[],
+    rating NUMERIC(2,1),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 

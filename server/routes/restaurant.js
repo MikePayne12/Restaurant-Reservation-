@@ -1,107 +1,34 @@
+// C:\Users\Admin\RAUL\server\routes\restaurant.js
+
 const express = require('express');
 const router = express.Router();
-const { storage } = require('../models/sql-storage');
-const { authenticateToken, requireAdmin } = require('../utils/auth');
+const db = require('../db');
 
-// Get all restaurants
+// Get all restaurants - This is public for browsing
 router.get('/', async (req, res) => {
   try {
-    const restaurants = await storage.listRestaurants();
-    res.json(restaurants);
+    const result = await db.query('SELECT * FROM restaurants');
+    res.json(result.rows);
   } catch (error) {
-    console.error('Error getting restaurants:', error);
+    console.error('Error fetching restaurants:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Search restaurants
-router.get('/search', async (req, res) => {
-  try {
-    const { query } = req.query;
-    if (!query) {
-      return res.status(400).json({ message: 'Search query is required' });
-    }
-    
-    const restaurants = await storage.searchRestaurants(query);
-    res.json(restaurants);
-  } catch (error) {
-    console.error('Error searching restaurants:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Get a specific restaurant
+// Get a specific restaurant by ID - This is public for browsing
 router.get('/:id', async (req, res) => {
   try {
-    const restaurant = await storage.getRestaurant(parseInt(req.params.id));
+    const { id } = req.params;
+    const restaurantResult = await db.query('SELECT * FROM restaurants WHERE id = $1', [id]);
     
-    if (!restaurant) {
+    if (restaurantResult.rows.length === 0) {
       return res.status(404).json({ message: 'Restaurant not found' });
     }
     
+    const restaurant = restaurantResult.rows[0];
     res.json(restaurant);
   } catch (error) {
-    console.error('Error getting restaurant:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Admin: Create a restaurant (admin only)
-router.post('/', authenticateToken, requireAdmin, async (req, res) => {
-  try {
-    const { name, description, cuisineType, priceRange, location, imageUrl, openTime, closeTime, capacity } = req.body;
-    
-    // Validate restaurant data
-    if (!name || !location) {
-      return res.status(400).json({ message: 'Restaurant name and location are required' });
-    }
-    
-    // Create restaurant
-    const restaurant = await storage.createRestaurant({
-      name,
-      description,
-      cuisineType,
-      priceRange,
-      location,
-      imageUrl,
-      openTime,
-      closeTime,
-      capacity
-    });
-    
-    res.status(201).json(restaurant);
-  } catch (error) {
-    console.error('Error creating restaurant:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Admin: Update a restaurant (admin only)
-router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
-  try {
-    const { name, description, cuisineType, priceRange, location, imageUrl, openTime, closeTime, capacity } = req.body;
-    const restaurantId = parseInt(req.params.id);
-    
-    // Update restaurant
-    const updatedRestaurant = await storage.updateRestaurant(restaurantId, {
-      name,
-      description,
-      cuisineType,
-      priceRange,
-      location,
-      imageUrl,
-      openTime,
-      closeTime,
-      capacity
-    });
-    
-    if (!updatedRestaurant) {
-      return res.status(404).json({ message: 'Restaurant not found' });
-    }
-    
-    res.json(updatedRestaurant);
-  } catch (error) {
-    console.error('Error updating restaurant:', error);
+    console.error('Error fetching restaurant:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
